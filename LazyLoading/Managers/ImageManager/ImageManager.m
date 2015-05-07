@@ -29,24 +29,27 @@
 {
     documentManager = [[DocumentManager alloc] init];
     NSError *error = imageData.error;
+    UIImage *image;
+    
     NSData *imageRawData = [documentManager readImageData:imageData.imageName fromDir:ImageDirectory];
     
     if (!imageRawData)
     {
         imageRawData = [self downloadImage:&error];
-    }
-    UIImage *image;
-    
-    if (error == nil)
-    {
-        image = [UIImage imageWithData:imageRawData];
-        
-        [documentManager saveImageData:imageRawData fileName:imageData.imageName fromDir:ImageDirectory];
+        if (error == nil)
+        {
+            [documentManager saveImageData:imageRawData fileName:imageData.imageName fromDir:ImageDirectory];
+        }
+        else
+        {
+            imageData.error = error;
+        }
     }
     else
     {
-        imageData.error = error;
+        image = [UIImage imageWithData:imageRawData];
     }
+    
     [self processImageData:image];
 }
 
