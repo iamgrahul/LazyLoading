@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 InnovationM. All rights reserved.
 //
 #define MaxConcurrentImageDownload 10
-#define MaxImagesSizeInCache 10 //This sould in MBs
+#define MaxImagesSizeInCache 1 //This sould in MBs
 
 #import "ViewController.h"
 #import "CellData.h"
@@ -16,7 +16,7 @@
 #import "CachingManager.h"
 #import "LoadingTableViewCell.h"
 
-@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, ImageManagerDelegate, UIScrollViewDelegate>
+@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, ImageManagerDelegate, UIScrollViewDelegate, NSCacheDelegate>
 {
     NSMutableArray *cellDataArray;
     NSOperationQueue *imageOperationQueue;
@@ -38,6 +38,7 @@
     [imageOperationQueue setMaxConcurrentOperationCount:MaxConcurrentImageDownload];
     imageDownLoadInProgressDictioanry = [[NSMutableDictionary alloc] init];
     imageCache = cachingManager.imageCache;
+    imageCache.delegate = self;
     [imageCache setTotalCostLimit:(1024 * 1024 * MaxImagesSizeInCache)];
     lazyTableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     
@@ -169,9 +170,17 @@
         }
         else
         {
-            [imageCache setObject:imageData.image forKey:imageData.imageURL cost:imageData.size];
+            if (imageData.image)
+            {
+                [imageCache setObject:imageData.image forKey:imageData.imageURL cost:imageData.size];
+            }
         }
     });
+}
+
+-(void) cache:(NSCache *)cache willEvictObject:(id)obj
+{
+    NSLog(@" Here you will get callback when Object will be going to evict");
 }
 
 - (void)terminateAllDownloads
