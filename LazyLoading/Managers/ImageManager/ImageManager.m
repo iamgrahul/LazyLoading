@@ -39,6 +39,7 @@
         if (error == nil)
         {
             [documentManager saveImageData:imageRawData fileName:imageData.imageName fromDir:ImageDirectory];
+            imageData.size = imageRawData.length;
         }
         else
         {
@@ -48,6 +49,7 @@
     else
     {
         image = [UIImage imageWithData:imageRawData];
+        imageData.size = imageRawData.length;
     }
     
     [self processImageData:image];

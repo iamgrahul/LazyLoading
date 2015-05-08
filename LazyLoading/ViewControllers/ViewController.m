@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 InnovationM. All rights reserved.
 //
 #define MaxConcurrentImageDownload 10
+#define MaxImagesSizeInCache 10 //This sould in MBs
 
 #import "ViewController.h"
 #import "CellData.h"
@@ -37,6 +38,7 @@
     [imageOperationQueue setMaxConcurrentOperationCount:MaxConcurrentImageDownload];
     imageDownLoadInProgressDictioanry = [[NSMutableDictionary alloc] init];
     imageCache = cachingManager.imageCache;
+    [imageCache setTotalCostLimit:(1024 * 1024 * MaxImagesSizeInCache)];
     lazyTableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     
     [self getDataFromJson];
@@ -154,7 +156,7 @@
                 LazyTableViewCell *cell = (LazyTableViewCell *)[lazyTableView cellForRowAtIndexPath:imageData.indexPath];
                 
                 [cell.iconImageView setImage:imageData.image];
-                [imageCache setObject:imageData.image forKey:imageData.imageURL];
+                [imageCache setObject:imageData.image forKey:imageData.imageURL cost:imageData.size];
             }
             else
             {
@@ -167,7 +169,7 @@
         }
         else
         {
-            [imageCache setObject:imageData.image forKey:imageData.imageURL];
+            [imageCache setObject:imageData.image forKey:imageData.imageURL cost:imageData.size];
         }
     });
 }
